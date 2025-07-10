@@ -1,0 +1,21 @@
+[package]
+name = "simple-llm"
+version = "0.1.0"
+edition = "2021"
+description = "Educational implementation of GPT-2 style Transformer model in Rust"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/yourusername/simple-llm"
+readme = "README.md"
+keywords = ["transformer", "gpt2", "language-model", "educational", "nlp"]
+categories = ["science", "education"]
+
+[[bin]]
+name = "simple-llm"
+path = "src/main.rs"
+
+[dependencies]
+ndarray = "0.16.1"
+rand = "0.8.5"
+rand_distr = "0.4.3"
+anyhow = "1.0"

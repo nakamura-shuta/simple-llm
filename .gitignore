@@ -1,0 +1,16 @@
+# Rust build directory
+/target
+
+# Claude Code specific
+.claude
+
+# IDE specific
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Debug files
+*.pdb

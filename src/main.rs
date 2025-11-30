@@ -36,7 +36,19 @@ fn train_model(
 fn interactive_generation(model: &TrainableTransformer) {
     println!("\n=== テキスト生成モード ===");
     println!("プロンプトを入力してください (終了: 'quit' または 'exit')");
-    println!("生成パラメータ: temperature=0.8, 単語単位生成");
+    println!("生成パラメータ: temperature=0.3, 最大5単語生成");
+    println!();
+
+    // 語彙の一部を表示（特殊トークン以外）
+    println!("=== 使用可能な単語（一部） ===");
+    let vocab_sample: Vec<&str> = model.tokenizer.id_to_token
+        .iter()
+        .filter(|s| !s.starts_with('<'))
+        .take(20)
+        .map(|s| s.as_str())
+        .collect();
+    println!("{}", vocab_sample.join(", "));
+    println!("...");
     println!();
 
     let stdin = io::stdin();
@@ -56,21 +68,37 @@ fn interactive_generation(model: &TrainableTransformer) {
             continue;
         }
 
+        // デバッグ: 入力のエンコード結果を表示
+        let encoded = model.tokenizer.encode(input);
+        println!("\n[デバッグ] 入力: \"{}\"", input);
+        println!("[デバッグ] エンコード結果: {:?}", encoded);
+        println!("[デバッグ] unk_token_id: {}", model.tokenizer.unk_token_id);
+
+        // 未知語のチェック
+        let has_unk = encoded.iter().any(|&t| t == model.tokenizer.unk_token_id);
+        if has_unk {
+            println!("[警告] 入力に未知語が含まれています。学習データにある単語を使ってください。");
+        }
+
         // テキスト生成
         let max_words = if input.contains("質問") && input.contains("回答") {
             20  // Q&A形式の場合は長めに生成
         } else {
-            1   // 通常は1単語
+            5   // 5単語まで生成（1から変更）
         };
-        
+
         let generated = model.generate(
             input,
             max_words,
-            0.8,        // temperature
+            0.3,        // temperature（低いほど予測可能な出力）
         );
 
         println!("\n生成結果:");
-        println!("{}", generated);
+        if generated.is_empty() {
+            println!("(空 - EOSトークンが生成されました)");
+        } else {
+            println!("{}", generated);
+        }
         println!();
     }
 }
@@ -142,8 +170,8 @@ fn main() -> Result<()> {
     println!("  - 最大シーケンス長: {}", max_seq_len);
     println!("  - 学習率: {}", learning_rate);
 
-    // トレーニング（エポック数を増やす）
-    train_model(&mut model, &texts, 100);
+    // トレーニング（エポック数を増やしてパターンをより深く学習）
+    train_model(&mut model, &texts, 300);
 
     // インタラクティブ生成
     interactive_generation(&model);

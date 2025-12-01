@@ -149,7 +149,7 @@ fn main() -> Result<()> {
     let num_heads = 4;
     let num_layers = 2;
     let max_seq_len = 128;
-    let learning_rate = 0.01;  // 学習率を上げて効果を見やすくする
+    let learning_rate = 0.01;
     
     // テキストデータからモデルを作成
     let texts_refs: Vec<&str> = texts.iter().map(|s| s.as_str()).collect();
@@ -170,7 +170,7 @@ fn main() -> Result<()> {
     println!("  - 最大シーケンス長: {}", max_seq_len);
     println!("  - 学習率: {}", learning_rate);
 
-    // トレーニング（エポック数を増やしてパターンをより深く学習）
+    // トレーニング
     train_model(&mut model, &texts, 300);
 
     // インタラクティブ生成
